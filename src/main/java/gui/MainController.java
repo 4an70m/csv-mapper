@@ -71,8 +71,8 @@ public class MainController {
         if (file != null) {
 
             this.inputFilePath.setText(file.getAbsolutePath());
-            if (outputFilePath.getText().isEmpty()) {
-                outputFilePath.setText(helper.addSuffixToFileName(file.getAbsolutePath(), "_mapped"));
+            if (this.outputFilePath.getText().isEmpty()) {
+                this.outputFilePath.setText(this.helper.addSuffixToFileName(file.getAbsolutePath(), "_mapped"));
             }
 
             this.csvFile = new CsvLimitedRowsFile(file.getAbsolutePath());
@@ -88,7 +88,7 @@ public class MainController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Csv file", "*.csv"));
         File file = fileChooser.showSaveDialog(this.stage);
         if (file != null) {
-            outputFilePath.setText(file.getAbsolutePath());
+            this.outputFilePath.setText(file.getAbsolutePath());
         }
     }
 
@@ -145,7 +145,7 @@ public class MainController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Csv file", "*.csv"));
         File file = fileChooser.showOpenDialog(this.stage);
         if (file != null) {
-            inputMappingFilePath.setText(file.getAbsolutePath());
+            this.inputMappingFilePath.setText(file.getAbsolutePath());
             this.csvMappingFile = new CsvLimitedRowsFile(file.getAbsolutePath());
             this.helper.setValuessToPicklist(this.picklistMappingKey, this.csvMappingFile.getHeader());
             this.helper.setValuessToPicklist(this.picklistMappingValue, this.csvMappingFile.getHeader());

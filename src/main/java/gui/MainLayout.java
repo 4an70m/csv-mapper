@@ -24,7 +24,6 @@ public class MainLayout extends Application {
         loader.setController(new MainController(primaryStage));
         AnchorPane root = loader.load();
         Scene scene = new Scene(root);
-        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
