@@ -8,6 +8,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import vlookup.CsvFile;
 import vlookup.CsvLimitedRowsFile;
+import vlookup.VlookupProcessor;
 
 import java.io.File;
 
@@ -19,6 +20,8 @@ public class MainController {
     private Stage stage;
     private MainControllerHelper helper;
     private CsvFile csvFile;
+    private CsvFile csvMappingFile;
+    private VlookupProcessor vlookupProcessor;
 
     public MainController(Stage primaryStage) {
         this.stage = primaryStage;
@@ -67,7 +70,7 @@ public class MainController {
         File file = fileChooser.showOpenDialog(this.stage);
         if (file != null) {
 
-            inputFilePath.setText(file.getAbsolutePath());
+            this.inputFilePath.setText(file.getAbsolutePath());
             if (outputFilePath.getText().isEmpty()) {
                 outputFilePath.setText(helper.addSuffixToFileName(file.getAbsolutePath(), "_mapped"));
             }
@@ -75,7 +78,6 @@ public class MainController {
             this.csvFile = new CsvLimitedRowsFile(file.getAbsolutePath());
             this.helper.setValuessToPicklist(this.picklistInputField, this.csvFile.getHeader());
             this.helper.setValuessToPicklist(this.picklistOutputField, this.csvFile.getHeader());
-            this.helper.showFirst5Rows(this.tablePreview, this.csvFile);
         }
     }
 
@@ -90,11 +92,47 @@ public class MainController {
         }
     }
 
+    /*
+     * Run lookup methods
+     */
+
     @FXML
-    public void runVlookup() {}
+    public void runVlookup() {
+        this.csvFile = new CsvFile(this.inputFilePath.getText());
+        this.vlookupProcessor = new VlookupProcessor(this.inputMappingFilePath.getText())
+                .setKeyHeaderValueHeader(this.picklistMappingKey.getValue(), this.picklistMappingValue.getValue())
+                .setTargetSearchHeaderName(this.picklistInputField.getValue())
+                .setTargetSearchResultHeaderName(this.picklistOutputField.getValue())
+                .setDefaultFoundValue(this.textDefaultNullValue.getText())
+                .buildLookup();
+        this.csvFile.processLines(this.vlookupProcessor);
+        this.csvFile.writeFile(this.outputFilePath.getText());
+    }
 
     @FXML
     public void runPreviewVlookup() {
+        this.csvFile = new CsvLimitedRowsFile(this.inputFilePath.getText());
+        this.vlookupProcessor = new VlookupProcessor(this.inputMappingFilePath.getText())
+                .setKeyHeaderValueHeader(this.picklistMappingKey.getValue(), this.picklistMappingValue.getValue())
+                .setTargetSearchHeaderName(this.picklistInputField.getValue())
+                .setTargetSearchResultHeaderName(this.picklistOutputField.getValue())
+                .setDefaultFoundValue(this.textDefaultNullValue.getText())
+                .buildLookup();
+        this.csvFile.processLines(this.vlookupProcessor);
+        String[] columnNames = new String[] {
+                this.picklistInputField.getValue(),
+                this.picklistOutputField.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tablePreview,this.csvFile, columnNames);
+    }
+
+    @FXML
+    public void refreshPreview() {
+        String[] columnNames = new String[] {
+                this.picklistInputField.getValue(),
+                this.picklistOutputField.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tablePreview, this.csvFile, columnNames);
     }
 
     /*
@@ -108,14 +146,49 @@ public class MainController {
         File file = fileChooser.showOpenDialog(this.stage);
         if (file != null) {
             inputMappingFilePath.setText(file.getAbsolutePath());
-            this.csvFile = new CsvLimitedRowsFile(file.getAbsolutePath());
-            this.helper.setValuessToPicklist(this.picklistMappingKey, this.csvFile.getHeader());
-            this.helper.setValuessToPicklist(this.picklistMappingValue, this.csvFile.getHeader());
-            this.helper.showFirst5Rows(this.tableMappingPreview, this.csvFile);
+            this.csvMappingFile = new CsvLimitedRowsFile(file.getAbsolutePath());
+            this.helper.setValuessToPicklist(this.picklistMappingKey, this.csvMappingFile.getHeader());
+            this.helper.setValuessToPicklist(this.picklistMappingValue, this.csvMappingFile.getHeader());
         }
     }
 
+    @FXML
+    public void showMappingKeyColumn() {
+        String[] columnNames = new String[] {
+            this.picklistMappingKey.getValue(),
+            this.picklistMappingValue.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tableMappingPreview, this.csvMappingFile, columnNames);
 
+    }
+
+    @FXML
+    public void showMappingValueColumn() {
+        String[] columnNames = new String[] {
+                this.picklistMappingKey.getValue(),
+                this.picklistMappingValue.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tableMappingPreview, this.csvMappingFile, columnNames);
+    }
+
+    @FXML
+    public void showInputFieldColumn() {
+        String[] columnNames = new String[] {
+                this.picklistInputField.getValue(),
+                this.picklistOutputField.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tablePreview, this.csvFile, columnNames);
+        this.picklistOutputField.getSelectionModel().select(this.picklistInputField.getSelectionModel().getSelectedIndex());
+    }
+
+    @FXML
+    public void showOutputFieldColumn() {
+        String[] columnNames = new String[] {
+                this.picklistInputField.getValue(),
+                this.picklistOutputField.getValue()
+        };
+        this.helper.showFirst5RowsWithColumns(this.tablePreview, this.csvFile, columnNames);
+    }
 
 
 }

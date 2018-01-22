@@ -8,6 +8,10 @@ import java.util.Map;
  */
 public class CsvRow extends LinkedHashMap<String, String> {
 
+    public CsvRow() {
+        super();
+    }
+
     public CsvRow(Map<String, String> stringStringMap) {
         super(stringStringMap);
     }
