@@ -71,9 +71,7 @@ public class MainController {
         if (file != null) {
 
             this.inputFilePath.setText(file.getAbsolutePath());
-            if (this.outputFilePath.getText().isEmpty()) {
-                this.outputFilePath.setText(this.helper.addSuffixToFileName(file.getAbsolutePath(), "_mapped"));
-            }
+            this.outputFilePath.setText(this.helper.addSuffixToFileName(file.getAbsolutePath(), "_mapped"));
 
             this.csvFile = new CsvLimitedRowsFile(file.getAbsolutePath());
             this.helper.setValuessToPicklist(this.picklistInputField, this.csvFile.getHeader());
